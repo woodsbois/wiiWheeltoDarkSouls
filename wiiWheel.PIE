@@ -1,0 +1,167 @@
+/*+++++++++++++++++MARIOKART------------>DARKSOULS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ writen by woodsbois
+ feel free to use at your own risk,
+ PLEASE SUBSCRIBE  xD
+ 12/12/2024
+  ⠀⠀⠀⢠⠤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣄⠀⠀
+⠀⠀⠀⢸⣿⣎⢛⡶⠤⣤⣤⣤⣀⣀⡴⠞⣩⣵⣾⡇⠀
+⠀⠀⠀⠘⣞⡟⠁⠀⠘⠉⠀⠀⠀⠙⠁⣾⣿⣿⣹⠀⠀
+⠀⠀⠀⣴⢋⣦⡄⢀⠀⠀⢀⣀⣀⠀⠀⠙⢿⣡⠃⠀⠀
+⠀⣠⡞⣡⣿⠟⣻⡆⣠⣾⠿⠿⣷⣍⠀⠀⠈⢳⡄⠀⠀
+⢾⣯⠘⣿⡿⣿⣿⡿⢿⣿⣀⣿⣿⣿⣿⡦⠀⠀⠹⣆⠀
+⠀⠙⢧⣿⣿⣿⠀⠀⠈⠻⢿⣿⣿⣿⡿⠋⠀⠀⢀⣘⣧
+⠀⠀⠈⠻⣯⣅⠀⠀⣐⣤⠀⠉⠉⠉⠀⢀⣠⡴⠟⠋⠁
+⠀⠀⠀⠀⠈⢿⣭⣉⣁⣤⠴⠾⠶⠒⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+*/
+//+++++++++++++++++++++++++++TURNING++++++++++++++++++++++++++++++++
+//Display the current yaw value on the screen
+debug = "Yaw: " + Wiimote.Yaw + "\nRoll: " + Wiimote.Roll + "\nPitch: " + Wiimote.Pitch
+
+
+// Threshold values for determining left and right turns
+var.pitchThreshold = 15 // Adjust for sensitivity
+
+// Get the current pitch value
+var.currentPitch = Wiimote.Pitch
+
+// Debugging: Display pitch value and key states
+debug = "Pitch: " + var.currentPitch + "\nKey A: " + Keyboard.A + "\nKey D: " + Keyboard.D
+
+// Neutral zone: No key pressed
+if abs(var.currentPitch) < var.pitchThreshold then
+    Keyboard.A = false
+    Keyboard.D = false
+endif
+
+// Turn left: Press and hold 'A'
+if var.currentPitch <= -var.pitchThreshold then
+    Keyboard.A = true
+    Keyboard.D = false
+endif
+
+// Turn right: Press and hold 'D'
+if var.currentPitch >= var.pitchThreshold then
+    Keyboard.D = true
+    Keyboard.A = false
+endif
+
+
+//++++++++++++++++++++DPAD+++++++++++++++++++++++++++++
+// D-Pad mappings
+if wiimote.Right then
+    keyboard.W = true
+else
+    keyboard.W = false
+endif
+
+if wiimote.Left then
+    keyboard.S = true
+else
+    keyboard.S = false
+endif
+// D-Pad to Mouse
+if Wiimote.Up then
+    Mouse.DirectInputX = Mouse.DirectInputX - var.mouseSpeed
+elseif Wiimote.Down then
+    Mouse.DirectInputX = Mouse.DirectInputX + var.mouseSpeed
+endif
+
+
+//++++++++++++++++LEDS+++++++++++++++++++++++++++++++++
+//explosion when blocking
+if wiimote.A then
+var.scrollSpeed = 30ms // Change scrolling speed
+Wiimote.Led1 = (time % (var.scrollSpeed * 4) < var.scrollSpeed)
+Wiimote.Led2 = (time % (var.scrollSpeed * 4) >= var.scrollSpeed) and (time % (var.scrollSpeed * 4) < var.scrollSpeed * 2)
+Wiimote.Led3 = (time % (var.scrollSpeed * 4) >= var.scrollSpeed * 2) and (time % (var.scrollSpeed * 4) < var.scrollSpeed * 3)
+Wiimote.Led4 = (time % (var.scrollSpeed * 4) >= var.scrollSpeed * 3)
+else
+// LEDs light up based on pitch angle
+var.pitch = Wiimote.Pitch
+
+Wiimote.Led1 = var.pitch < -30 // Extreme left
+Wiimote.Led2 = var.pitch >= -30 and var.pitch < 0 // Slight left
+Wiimote.Led3 = var.pitch >= 0 and var.pitch < 30 // Slight right
+Wiimote.Led4 = var.pitch >= 30 // Extreme right
+endif
+
+//++++++++++++LOOKCONTROLS+++++++++++++++++
+// Variables to control mouse speed
+var.mouseSpeed = 20 // Adjust this value for faster or slower movement
+
+// Debug to show current mouse movement direction
+debug = "Mouse Speed: " + var.mouseSpeed
+
+// Move the mouse up when plus is pressed
+if Wiimote.Plus then
+    Mouse.DirectInputY = Mouse.DirectInputY - var.mouseSpeed
+endif
+
+// Move the mouse up when minus is pressed
+if Wiimote.Minus then
+    Mouse.DirectInputY = Mouse.DirectInputY + var.mouseSpeed
+endif
+
+//+++++++++++MISC CONTROLS+++++++++++++++++++++
+if Wiimote.A then
+    Keyboard.R = true // Heal
+else
+    Keyboard.R = false
+endif
+
+if Wiimote.B then
+    Keyboard.Space = true // Dodge
+else
+    Keyboard.Space = false
+endif
+
+if Wiimote.Two then
+    Mouse.LeftButton = true // Attack
+else
+    Mouse.LeftButton = false
+endif
+
+if Wiimote.One then
+    Mouse.RightButton = true // Block
+else
+    Mouse.RightButton = false
+endif
+if Wiimote.Home then
+    Mouse.MiddleButton = true // lockin
+else
+    Mouse.MiddleButton = false
+endif
+
+//RUMBLE WHEN ATTACK
+if Wiimote.Two then
+    Wiimote.Rumble = true // Attack vibration
+    wait 100ms
+    Wiimote.Rumble = false
+endif
+/*
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣠⣤⡤⠤⠴⠶⠦⣤⣤⣤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀⣀⠀⠀⢀⣠⠶⢞⣻⣷⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣶⠾⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠙⠛⠲⠶⢤⣤⣤⣤⣀⣀⣀⣠⣴⡾⠿⠛⠛⠋⠉⣉⣉⣉⣉⡿⠋⣡⣾⣿⣿⡿⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⣠⣴⠟⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠚⠉⠉⠉⠉⠉⠛⠛⠀⠀⠀⠀⠶⣿⣿⣿⣿⡟⢁⣾⣿⡿⢋⣿⣿⡆⠀⠀
+⠀⠀⠀⢠⣴⠿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠀⠈⠙⠃⠘⠛⠋⠀⣼⣿⡿⠁⠀⠀
+⠀⠀⢠⣾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡇⠀⠀⠀
+⠀⠀⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⣀⡀⠀⠀⠀⠀⠈⢷⠀⠀⠀
+⠀⣼⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⣼⣿⣿⣷⣦⣤⡄⢸⠀⠀⠀
+⢰⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣇⠀⠀⠀⣿⣿⣿⣿⣿⣿⣷⡾⠀⠀⠀
+⢠⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡖⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⣷⣄⠀⠈⠙⠿⣿⣿⠉⢠⡇⠀⠀⠀
+⣸⡇⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡿⠛⠛⠿⣷⡄⠀⠀⠈⠁⠀⠀⣇⠀⠀⠀
+⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⡅⠀⠀⠀⠈⠻⣄⠀⠀⠀⠀⠀⠸⡄⠀⠀
+⢻⡇⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣄⠀⠀⠀⠀⠹⣧⡀⠀⢀⣤⣤⣷⠀⠀
+⠸⣧⠀⣰⣶⣶⣶⣦⣦⣤⣬⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⣦⣀⠀⠀⣠⣿⣿⣶⣾⣿⣯⣁⠀⠀
+⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⠉⠉⠉⠉⠉⠉⠉⠛⠛⠛⠿⢿⣿⣿⣿⠿⠿⣦
+⠀⠀⢻⣿⠟⣩⣴⣶⣿⣿⣷⣾⣿⡈⢧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠀⠈⠳⢤⠀⠀⠀⠀⠀⠀⠀⠀⢸⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠈⣇⣾⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠳⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠀⠀⠀⠈⢳⡄⠀⠀⠀⠀⠀⣠⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠸⣿⣿⡿⠛⠉⣠⣤⣤⣬⣽⣇⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠀⠀⠀⠀⠀⢹⣦⣄⠀⠀⡼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢿⡟⠀⣴⣿⣿⣿⣿⣿⣿⣿⣧⡀⠘⢦⠀⠀⠀⠀⠀⠀⢀⣾⠃⠀⠀⠀⠀⠀⠀⢿⣿⣆⢸⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠘⣆⢸⣿⣿⣿⣿⠟⠋⠉⠉⠉⠻⣄⠈⢷⣄⠀⠀⠀⢠⡾⠁⠀⠀⣀⣀⣀⠀⠀⠘⣿⣿⣿⣧⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠈⠻⣿⣿⡟⠁⠀⢀⣠⣤⣶⣶⣿⣆⠀⢻⣶⣶⣶⣿⣶⣶⣿⣿⣿⣿⣿⣿⣄⠀⠈⠛⠿⠿⠿⠷⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠈⠻⣄⠀⢠⣿⣿⣿⣿⡿⠿⠿⣦⠈⠛⠿⠿⠿⠿⠿⠿⣿⣿⣿⣍⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⢿⣿⣿⡿⠃⠀⠀⣀⣬⣇⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠓⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⠁⠀⢠⣾⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⠤⢿⣿⣿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+
+*/
